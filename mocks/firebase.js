@@ -20,7 +20,8 @@ const firebaseStub = (overrides, options = defaultOptions) => {
   firestoreConstructor.FieldPath = FakeFirestore.FieldPath;
 
   //Remove methods which do not exist in Firebase
-  delete firestoreConstructor.DocumentReference.prototype.listCollections;
+  // TODO: This does exist in later versions of firebase-admin.
+  // delete firestoreConstructor.DocumentReference.prototype.listCollections;
 
   // The Firebase mock
   return {
