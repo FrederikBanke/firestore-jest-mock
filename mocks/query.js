@@ -140,12 +140,14 @@ class Query {
   }
 
   startAfter(snapshotOrField) {
+    // TODO: Snapshots must contain fiels defined in orderBy and where constraints.
     this.cursor = snapshotOrField;
     this.inclusive = false;
     return mockStartAfter(...arguments) || this;
   }
 
   startAt(snapshotOrField) {
+    // TODO: Snapshots must contain fiels defined in orderBy and where constraints.
     this.cursor = snapshotOrField;
     this.inclusive = true;
     return mockStartAt(...arguments) || this;
