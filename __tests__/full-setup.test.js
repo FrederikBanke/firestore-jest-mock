@@ -463,6 +463,52 @@ describe.each`
         expect(mockGet).toHaveBeenCalled();
         expect(records).toHaveProperty('docs', expect.any(Array));
       });
+
+      test('convert data for single document', async () => {
+        const converter = {
+          fromFirestore: snap => ({
+            ...snap.data(),
+            country: snap.data().country.toLowerCase(),
+          }),
+          toFirestore: () => {},
+        };
+        const db = firebase.firestore();
+
+        const recordDoc = db.doc('cities/LA').withConverter(converter);
+
+        expect(mockDoc).toHaveBeenCalledWith('cities/LA');
+        expect(mockWithConverter).toHaveBeenCalledWith(converter);
+        expect(recordDoc).toBeInstanceOf(FakeFirestore.DocumentReference);
+
+        const record = await recordDoc.get();
+        expect(mockGet).toHaveBeenCalled();
+        expect(record).toHaveProperty('id', 'LA');
+        expect(record.data).toBeInstanceOf(Function);
+        expect(record.data().country).toBe('usa');
+      });
+
+      test('convert data in collection', async () => {
+        const converter = {
+          fromFirestore: snap => ({
+            ...snap.data(),
+            country: snap.data().country.toLowerCase(),
+          }),
+          toFirestore: () => {},
+        };
+        const db = firebase.firestore();
+
+        const recordsCol = db.collection('cities').withConverter(converter);
+
+        expect(mockCollection).toHaveBeenCalledWith('cities');
+        expect(mockWithConverter).toHaveBeenCalledWith(converter);
+        expect(recordsCol).toBeInstanceOf(FakeFirestore.CollectionReference);
+
+        const records = await recordsCol.get();
+        expect(mockGet).toHaveBeenCalled();
+        expect(records).toHaveProperty('docs', expect.any(Array));
+        expect(records.docs[0].data).toBeInstanceOf(Function);
+        expect(records.docs[0].data().country).toBe('usa');
+      });
     });
   });
 });

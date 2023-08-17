@@ -27,14 +27,14 @@ module.exports = function buildDocFromHash(hash = {}, id = 'abc123', selectField
       delete copy._readTime;
       delete copy._ref;
       delete copy._updateTime;
+      delete copy._converter;
 
       if (selectFields !== undefined) {
         copy = Object.keys(copy)
           .filter(key => key === 'id' || selectFields.includes(key))
           .reduce((res, key) => ((res[key] = copy[key]), res), {});
       }
-
-      return copy;
+      return hash._converter ? hash._converter.fromFirestore({ data: () => copy }) : copy;
     },
     get(fieldPath) {
       // The field path can be compound: from the firestore docs

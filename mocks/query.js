@@ -18,6 +18,7 @@ class Query {
     this.filters = [];
     this.selectFields = undefined;
     this.isGroupQuery = isGroupQuery;
+    this.converter = undefined;
   }
 
   get() {
@@ -56,6 +57,7 @@ class Query {
             return {
               ...doc,
               _ref: this.firestore._doc(path),
+              _converter: this.converter,
             };
           });
           requestedRecords.push(...docHashes);
@@ -123,7 +125,8 @@ class Query {
     return mockStartAt(...arguments) || this;
   }
 
-  withConverter() {
+  withConverter(converter) {
+    this.converter = converter;
     return mockWithConverter(...arguments) || this;
   }
 

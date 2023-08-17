@@ -246,6 +246,7 @@ FakeFirestore.DocumentReference = class {
       .split('/')
       .concat(id)
       .join('/');
+    this.converter = undefined;
   }
 
   collection(collectionName) {
@@ -407,6 +408,7 @@ FakeFirestore.DocumentReference = class {
     if (document) {
       document._ref = this;
       document._readTime = timestamp.Timestamp.now();
+      document._converter = this.converter;
       return buildDocFromHash(document);
     } else {
       return {
@@ -421,8 +423,9 @@ FakeFirestore.DocumentReference = class {
     }
   }
 
-  withConverter() {
+  withConverter(converter) {
     query.mocks.mockWithConverter(...arguments);
+    this.converter = converter;
     return this;
   }
 };
@@ -515,6 +518,7 @@ FakeFirestore.CollectionReference = class extends FakeFirestore.Query {
     const records = this._records().map(rec => ({
       ...rec,
       _ref: new FakeFirestore.DocumentReference(rec.id, this, this.firestore),
+      _converter: this.converter,
     }));
     // Firestore does not return documents with no local data
     const isFilteringEnabled = this.firestore.options.simulateQueryFilters;
