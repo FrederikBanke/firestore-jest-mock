@@ -38,6 +38,7 @@ export class FakeFirestore {
 
   static DocumentReference: typeof DocumentReference;
   static CollectionReference: typeof CollectionReference;
+  static BulkWriter: typeof BulkWriter;
 
   database: FakeFirestoreDatabase;
   options: Record<string, never>;
@@ -54,6 +55,7 @@ export class FakeFirestore {
   collectionGroup(collectionName: string): Query;
   doc(path: string): DocumentReference;
   runTransaction<T>(updateFunction: (transaction: Transaction) => Promise<T>): Promise<T>;
+  bulkWriter(): BulkWriter;
 }
 
 declare class DocumentReference {
@@ -77,6 +79,8 @@ declare class DocumentReference {
 
   onSnapshot(callback: () => void, errorCallback: () => void): () => void;
   onSnapshot(options: Record<string, never>, callback: () => void, errorCallback: () => void): () => void;
+
+  listCollections(): void;
 
   /** @deprecated Call the analagous method on a `Query` instance instead. */
   orderBy(): never;
@@ -111,7 +115,59 @@ declare class CollectionReference extends FakeFirestore.Query {
    * the list of database records referenced by this CollectionReference.
    * @returns An array of mocked document records.
    */
-  private _records(): Array<MockedDocument>
+  private _records(): Array<MockedDocument>;
+}
+
+declare class BulkWriter {
+  private constructor();
+
+  create(
+    documentRef: DocumentReference,
+    data: MockedDocument
+  ): Promise<unknown>;
+
+  delete(
+    documentRef: DocumentReference,
+    precondition?: unknown
+  ): Promise<unknown>;
+
+  set(
+    documentRef: DocumentReference,
+    data: unknown,
+    options: SetOptions
+  ): Promise<unknown>;
+  set(
+    documentRef: DocumentReference,
+    data: unknown
+  ): Promise<unknown>;
+
+  update(
+    documentRef: DocumentReference,
+    data: unknown,
+    precondition?: unknown
+  ): Promise<unknown>;
+
+  update(
+    documentRef: DocumentReference,
+    field: string | FieldPath,
+    value: unknown,
+    ...fieldsOrPrecondition: unknown[]
+  ): Promise<unknown>;
+
+  onWriteResult(
+    callback: (
+      documentRef: DocumentReference,
+      result: unknown
+    ) => void
+  ): void;
+
+  onWriteError(
+    shouldRetryCallback: (error: Error) => boolean
+  ): void;
+
+  flush(): Promise<void>;
+
+  close(): Promise<void>;
 }
 
 // Mocks exported from this module
@@ -126,6 +182,12 @@ export const mockSet: jest.Mock;
 export const mockAdd: jest.Mock;
 export const mockDelete: jest.Mock;
 export const mockSettings: jest.Mock;
+export const mockBulkWriter: jest.Mock;
+export const mockCreate: jest.Mock;
+export const mockOnWrite: jest.Mock;
+export const mockOnWriteResult: jest.Mock;
+export const mockClose: jest.Mock;
+export const mockFlush: jest.Mock;
 
 // FIXME: We should decide whether this should be exported from auth or firestore
 export const mockUseEmulator: jest.Mock;

@@ -1,5 +1,15 @@
 const { FakeFirestore } = require('firestore-jest-mock');
-const { mockCollection, mockDoc } = require('firestore-jest-mock/mocks/firestore');
+const {
+  mockCollection,
+  mockDoc,
+  mockBulkWriter,
+  mockClose,
+  mockSet,
+  mockUpdate,
+  mockFlush,
+  mockDelete,
+  mockCreate,
+} = require('firestore-jest-mock/mocks/firestore');
 
 describe('Queries', () => {
   beforeEach(() => {
@@ -286,6 +296,29 @@ describe('Queries', () => {
         expect(docs).toHaveProperty('size', expectedSize);
       },
     );
+
+    test('it calls bulkWriter() mock', () => {
+      db().bulkWriter();
+
+      expect(mockBulkWriter).toHaveBeenCalled();
+    });
+
+    test('it calls bulkWriter() mocks', () => {
+      const writer = db().bulkWriter();
+      writer.set();
+      writer.create();
+      writer.update();
+      writer.flush();
+      writer.delete();
+      writer.close();
+
+      expect(mockSet).toHaveBeenCalled();
+      expect(mockCreate).toHaveBeenCalled();
+      expect(mockUpdate).toHaveBeenCalled();
+      expect(mockFlush).toHaveBeenCalled();
+      expect(mockDelete).toHaveBeenCalled();
+      expect(mockClose).toHaveBeenCalled();
+    });
   });
 
   describe('Multiple records versus queries', () => {

@@ -12,6 +12,12 @@ const mockAdd = jest.fn();
 const mockDelete = jest.fn();
 const mockListDocuments = jest.fn();
 const mockListCollections = jest.fn();
+const mockBulkWriter = jest.fn();
+const mockCreate = jest.fn();
+const mockClose = jest.fn();
+const mockFlush = jest.fn();
+const mockOnWrite = jest.fn();
+const mockOnWriteResult = jest.fn();
 
 const mockBatchDelete = jest.fn();
 const mockBatchCommit = jest.fn();
@@ -222,6 +228,11 @@ class FakeFirestore {
       ...object,
       id: docId,
     };
+  }
+
+  bulkWriter() {
+    mockBulkWriter(...arguments);
+    return new FakeFirestore.BulkWriter();
   }
 }
 
@@ -538,6 +549,62 @@ FakeFirestore.CollectionReference = class extends FakeFirestore.Query {
   }
 };
 
+/*
+ * ============
+ *  Bulk Writer
+ * ============
+ */
+
+FakeFirestore.BulkWriter = class {
+  /** @private */
+  constructor(firestore) {
+    this.firestore = firestore;
+  }
+
+  create() {
+    mockCreate(...arguments);
+    return Promise.resolve();
+  }
+
+  delete() {
+    mockDelete(...arguments);
+    return Promise.resolve();
+  }
+
+  set() {
+    mockSet(...arguments);
+    return Promise.resolve();
+  }
+
+  update() {
+    mockUpdate(...arguments);
+    return Promise.resolve();
+  }
+
+  onWriteResult() {
+    mockOnWriteResult(...arguments);
+  }
+
+  onWriteError() {
+    mockOnWrite(...arguments);
+  }
+
+  flush() {
+    mockFlush();
+    return this._flush();
+  }
+
+  _flush() {
+    return Promise.resolve();
+  }
+
+  close() {
+    mockClose();
+    const flushPromise = this._flush();
+    return flushPromise;
+  }
+};
+
 module.exports = {
   FakeFirestore,
   mockBatch,
@@ -558,6 +625,12 @@ module.exports = {
   mockOnSnapShot,
   mockListDocuments,
   mockListCollections,
+  mockBulkWriter,
+  mockCreate,
+  mockOnWrite,
+  mockOnWriteResult,
+  mockClose,
+  mockFlush,
   ...query.mocks,
   ...transaction.mocks,
   ...fieldValue.mocks,
