@@ -70,7 +70,7 @@ class Query {
         }
 
         // Enqueue adjacent collections for next run
-        docs.forEach(doc => {
+        docs?.forEach(doc => {
           if (doc._collections) {
             queue.push({
               lastParent: `${prefix}${collectionPath}/${doc.id}`,
