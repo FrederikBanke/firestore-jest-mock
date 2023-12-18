@@ -281,6 +281,11 @@ FakeFirestore.DocumentReference = class {
     return Promise.resolve(collectionRefs);
   }
 
+  create() {
+    mockCreate(...arguments);
+    return Promise.resolve();
+  }
+
   delete() {
     mockDelete(...arguments);
     return Promise.resolve();
